@@ -12,13 +12,8 @@ public class Main {
   }
 
   private static void startBot() {
-    // Initialize Api Context
     ApiContextInitializer.init();
-
-    // Instantiate Telegram Bots API
     TelegramBotsApi botsApi = new TelegramBotsApi();
-
-    // Register our bot
     try {
       botsApi.registerBot(new GermanoBot());
     } catch (TelegramApiException e) {
