@@ -1,4 +1,4 @@
-package com.telegram.bot;
+package com.telegram.bot.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

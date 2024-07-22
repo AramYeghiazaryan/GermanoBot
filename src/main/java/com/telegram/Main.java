@@ -1,8 +1,11 @@
 package com.telegram;
 
-import com.telegram.bot.GermanoBot;
+import com.telegram.bot.handler.GermanoBot;
+import com.telegram.duolingo.model.UserData;
+import com.telegram.duolingo.service.DuolingoService;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class Main {
@@ -12,12 +15,16 @@ public class Main {
   }
 
   private static void startBot() {
-    ApiContextInitializer.init();
-    TelegramBotsApi botsApi = new TelegramBotsApi();
-    try {
-      botsApi.registerBot(new GermanoBot());
-    } catch (TelegramApiException e) {
-      e.printStackTrace();
-    }
+    DuolingoService duolingoService = new DuolingoService();
+    UserData userData = duolingoService.getUserData();
+    duolingoService.getPracticedLexemes(userData.getProgressedSkills());
+
+//    ApiContextInitializer.init();
+//    TelegramBotsApi botsApi = new TelegramBotsApi();
+//    try {
+//      botsApi.registerBot(new GermanoBot());
+//    } catch (TelegramApiException e) {
+//      e.printStackTrace();
+//    }
   }
 }

@@ -1,4 +1,4 @@
-package com.telegram.bot;
+package com.telegram.bot.model;
 
 public enum BotCommand {
   DICTIONARY("dictionary"),

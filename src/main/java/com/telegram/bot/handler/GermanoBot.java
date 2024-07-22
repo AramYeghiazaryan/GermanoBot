@@ -1,8 +1,10 @@
-package com.telegram.bot;
+package com.telegram.bot.handler;
 
-import static com.telegram.bot.BotCommand.DICTIONARY;
-import static com.telegram.bot.BotCommand.QUIZZES;
+import static com.telegram.bot.model.BotCommand.DICTIONARY;
+import static com.telegram.bot.model.BotCommand.QUIZZES;
 
+import com.telegram.bot.model.BotCommand;
+import com.telegram.bot.service.DictionaryService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
