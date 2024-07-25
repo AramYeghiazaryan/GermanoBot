@@ -2,7 +2,10 @@ package com.telegram.bot.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.telegram.duolingo.model.LearnedWordsResponse;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -12,16 +15,30 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+@Component
 public class DictionaryService {
 
   private static final ObjectMapper MAPPER = new ObjectMapper().configure(
       SerializationFeature.INDENT_OUTPUT, true);
-  ;
+
+  public boolean updateDictionaryFile(LearnedWordsResponse learnedWordsResponse) {
+    try {
+      BufferedWriter out = new BufferedWriter(new FileWriter("src/main/resources/dictionary.json"));
+      out.write(MAPPER.writerWithDefaultPrettyPrinter()
+          .writeValueAsString(learnedWordsResponse.getLearnedLexemes())
+      );
+      out.close();
+      return true;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   public SendMessage getDictionaryTable(long chatId) {
-    URL url = getClass().getClassLoader().getResource("dictionary.md");
+    URL url = getClass().getClassLoader().getResource("dictionary.json");
     SendMessage message = new SendMessage();
     if (url == null) {
       System.err.println("File not found in resources folder");
@@ -38,14 +55,13 @@ public class DictionaryService {
         dictionary.add(processEachLine(line));
       }
 
-      message = new SendMessage()
+      return new SendMessage()
           .setChatId(chatId)
           .setText(MAPPER.writeValueAsString(dictionary));
 
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return message;
   }
 
   private LinkedHashMap<String, String> processEachLine(String line) {

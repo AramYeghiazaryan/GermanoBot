@@ -2,18 +2,37 @@ package com.telegram.duolingo.client;
 
 import com.telegram.duolingo.model.LearnedWordsResponse;
 import com.telegram.duolingo.model.LexemesCountResponse;
+import com.telegram.duolingo.model.ProgressedSkill;
 import com.telegram.duolingo.model.UserResponse;
-import feign.RequestLine;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+@Component
+@FeignClient(name = "duolingoClient", url = "https://api.duolingo.com/2017-06-30")
 public interface DuolingoClient {
 
-  @RequestLine("GET /2017-06-30/users/1508386556")
+  @GetMapping("/users/1508386556")
   UserResponse getUserData();
 
-  @RequestLine("POST /2017-06-30/users/1508386556/courses/de/en/learned-lexemes/count")
-  LexemesCountResponse getLearnedLexemesCount(String requestBody);
+  @PostMapping(value = "/users/1508386556/courses/de/en/learned-lexemes/count",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
+  LexemesCountResponse getLearnedLexemesCount(
+      @RequestBody Map<String, Set<ProgressedSkill>> requestBody);
 
-  //TODO make autoPagination to load all
-  @RequestLine("POST /2017-06-30/users/1508386556/courses/de/en/learned-lexemes?limit=100&sortBy=LEARNED_DATE&startIndex=0")
-  LearnedWordsResponse getLearnedLexemes(String requestBody);
+  @PostMapping(value = "/users/1508386556/courses/de/en/learned-lexemes")
+  LearnedWordsResponse getLearnedLexemes(
+      @RequestParam("limit") String limit,
+      @RequestParam("sortBy") String sortBy,
+      @RequestParam("startIndex") String startIndex,
+      @RequestBody Map<String, Object> requestBody
+  );
 }

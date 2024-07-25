@@ -5,6 +5,8 @@ import static com.telegram.bot.model.BotCommand.QUIZZES;
 
 import com.telegram.bot.model.BotCommand;
 import com.telegram.bot.service.DictionaryService;
+import com.telegram.duolingo.service.AudioSystemService;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,6 +17,7 @@ public class GermanoBot extends TelegramLongPollingBot {
   private static final String BOT_TOKEN = "7277366517:AAEeLitCCl4pwRHpA3tFPMfN3QCA0vLVbcc";
   private static final String BOT_USERNAME = "Learn_DeutschBot";
   private static final DictionaryService dictionaryService = new DictionaryService();
+  private static final AudioSystemService audioSystemService = new AudioSystemService();
 
   @Override
   public void onUpdateReceived(Update update) {
@@ -25,7 +28,15 @@ public class GermanoBot extends TelegramLongPollingBot {
       long chatId = update.getMessage().getChatId();
 
       BotCommand command = BotCommand.fromCommandName(messageText);
-      sendResponse(processMessage(command, chatId));
+//      sendResponse(processMessage(command, chatId));
+
+      try {
+        execute(audioSystemService.sendAudioMessage(chatId,
+            "https://d1vq87e9lcf771.cloudfront.net/beade/b64a51050ee6e4849be4ed7e26004876",
+            "", ""));
+      } catch (TelegramApiException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 
