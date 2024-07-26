@@ -1,13 +1,18 @@
 package com.telegram.mongo.entity;
 
+import java.util.UUID;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collation = "Lexemes")
-public class LexemesEntity {
+@Data
+@Document(collation = "lexemes")
+public class LexemeEntity {
+
   @Id
-  private String lexemeId;
+  private Long lexemeId;
   private String word;
   private String translation;
-  private boolean isNew;
+  private Boolean isNew;
+  private String audioURL;
 }

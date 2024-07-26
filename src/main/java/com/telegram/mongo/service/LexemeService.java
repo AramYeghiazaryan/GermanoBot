@@ -1,11 +1,11 @@
 package com.telegram.mongo.service;
 
 
-import com.telegram.duolingo.model.Lexeme;
+import com.telegram.mongo.entity.LexemeEntity;
 import com.telegram.mongo.repository.LexemeRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -13,15 +13,19 @@ public class LexemeService {
 
   private final LexemeRepository lexemeRepository;
 
-  public List<Lexeme> getAll() {
+  public List<LexemeEntity> getAll() {
     return lexemeRepository.findAll();
   }
 
-  public Lexeme save(Lexeme lexeme) {
+  public List<LexemeEntity> saveAll(List<LexemeEntity> lexemes) {
+    return lexemeRepository.saveAll(lexemes);
+  }
+
+  public LexemeEntity save(LexemeEntity lexeme) {
     return lexemeRepository.save(lexeme);
   }
 
-  public Lexeme getById(String id) {
+  public LexemeEntity getById(String id) {
     return lexemeRepository.findById(id).orElse(null);
   }
 }

@@ -1,8 +1,8 @@
 package com.telegram.bot.constants;
 
 public enum BotCommand {
-  DICTIONARY("dictionary"),
-  QUIZZES("quiz"),
+  UPDATE_DICTIONARY("update dictionary"),
+  CREATE_QUIZZES("create a quiz"),
   START("start"),
   STOP("stop");
 

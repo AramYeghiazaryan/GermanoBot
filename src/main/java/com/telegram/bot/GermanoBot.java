@@ -7,7 +7,11 @@ import static org.telegram.abilitybots.api.util.AbilityUtils.getChatId;
 import com.telegram.bot.constants.BotCommand;
 import com.telegram.bot.constants.Constants;
 import com.telegram.bot.handler.MessageFactory;
+import com.telegram.bot.service.DictionaryService;
 import java.util.function.BiConsumer;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.bot.BaseAbilityBot;
@@ -28,9 +32,9 @@ public class GermanoBot extends AbilityBot {
     return 1;
   }
 
-  public GermanoBot() {
+  public GermanoBot(ApplicationContext context) {
     super(BOT_TOKEN, BOT_USERNAME);
-    messageFactory = new MessageFactory(sender);
+    messageFactory = new MessageFactory(sender, context.getBean(DictionaryService.class));
   }
 
   public Ability startBot() {
@@ -44,8 +48,9 @@ public class GermanoBot extends AbilityBot {
         .build();
   }
 
-  public Reply replyToButtons(){
-    BiConsumer<BaseAbilityBot, Update> action = (abilityBot, upd) -> messageFactory.replyToButtons(getChatId(upd), upd.getMessage());
+  public Reply replyToButtons() {
+    BiConsumer<BaseAbilityBot, Update> action = (abilityBot, upd) -> messageFactory.replyToButtons(
+        getChatId(upd), upd.getMessage());
     return Reply.of(action, Flag.TEXT, upd -> messageFactory.isUserActive(getChatId(upd)));
   }
 }

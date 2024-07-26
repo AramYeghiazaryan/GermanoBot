@@ -2,6 +2,9 @@ package com.telegram.bot.handler;
 
 import com.telegram.bot.constants.BotCommand;
 import com.telegram.bot.constants.Constants;
+import com.telegram.bot.service.DictionaryService;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import org.telegram.abilitybots.api.sender.MessageSender;
@@ -13,10 +16,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class MessageFactory {
 
   private final MessageSender sender;
-  private final WeakHashMap<Long, Boolean> userSession = new WeakHashMap<>();
+  private final Map<Long, Boolean> userSession = new HashMap<>();
+  private final DictionaryService dictionaryService;
 
-  public MessageFactory(MessageSender sender) {
+  public MessageFactory(MessageSender sender,
+      DictionaryService dictionaryService) {
     this.sender = sender;
+    this.dictionaryService = dictionaryService;
   }
 
   public void start(long chatId) {
@@ -49,23 +55,29 @@ public class MessageFactory {
     BotCommand command = Optional.ofNullable(
             BotCommand.fromCommandName(message.getText().replaceAll("/", "")))
         .orElseThrow(() -> new RuntimeException("No command Found"));
+
     if (BotCommand.STOP.equals(command)) {
       stopChat(chatId);
     }
 
+    doReplyByStrategy(chatId, command);
+  }
+
+  private void doReplyByStrategy(long chatId, BotCommand command) {
     switch (command) {
-      case DICTIONARY -> {
+      case UPDATE_DICTIONARY -> {
         try {
+          dictionaryService.updateDictionary();
           sender.execute(SendMessage.builder()
               .chatId(chatId)
-              .text("To be Coming Dictionary")
+              .text("Updated Dictionary")
               .replyMarkup(KeyboardFactory.startButtons())
               .build());
         } catch (TelegramApiException e) {
           throw new RuntimeException(e);
         }
       }
-      case QUIZZES -> {
+      case CREATE_QUIZZES -> {
         try {
           sender.execute(SendMessage.builder()
               .chatId(chatId)
@@ -75,10 +87,8 @@ public class MessageFactory {
         } catch (TelegramApiException e) {
           throw new RuntimeException(e);
         }
-
       }
     }
-
   }
 
   public boolean isUserActive(long chatId) {
