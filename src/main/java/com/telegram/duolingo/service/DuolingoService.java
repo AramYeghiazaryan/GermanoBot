@@ -1,6 +1,5 @@
 package com.telegram.duolingo.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.telegram.duolingo.client.DuolingoClient;
 import com.telegram.duolingo.model.GenericId;
 import com.telegram.duolingo.model.LearnedWordsResponse;
@@ -74,5 +73,4 @@ public class DuolingoService {
   public LexemesCountResponse getLexemesCount(Set<ProgressedSkill> progressedSkills) {
     return duolingoClient.getLearnedLexemesCount(Map.of("progressedSkills", progressedSkills));
   }
-
 }

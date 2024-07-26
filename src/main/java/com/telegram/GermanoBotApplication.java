@@ -1,38 +1,26 @@
 package com.telegram;
 
-import com.telegram.bot.service.DictionaryService;
-import com.telegram.duolingo.model.LearnedWordsResponse;
-import com.telegram.duolingo.model.UserData;
-import com.telegram.duolingo.service.DuolingoService;
+import com.telegram.bot.GermanoBot;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.telegram.abilitybots.api.bot.AbilityBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @SpringBootApplication
 @EnableFeignClients
 public class GermanoBotApplication {
 
   public static void main(String[] args) {
-    ConfigurableApplicationContext context = SpringApplication.run(GermanoBotApplication.class);
-    DuolingoService duolingoService = context.getBean(DuolingoService.class);
-    DictionaryService dictionaryService = context.getBean(DictionaryService.class);
-
-    UserData userData = duolingoService.getUserData();
-    LearnedWordsResponse learnedWordsResponse = duolingoService.getPracticedLexemes(
-        userData.getProgressedSkills());
-
-    dictionaryService.updateDictionaryFile(learnedWordsResponse);
-  }
-
-  private void startBot() {
-
-//    ApiContextInitializer.init();
-//    TelegramBotsApi botsApi = new TelegramBotsApi();
-//    try {
-//      botsApi.registerBot(new GermanoBot());
-//    } catch (TelegramApiException e) {
-//      e.printStackTrace();
-//    }
+    ConfigurableApplicationContext ctx = SpringApplication.run(GermanoBotApplication.class, args);
+    try {
+      TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+      botsApi.registerBot(ctx.getBean(GermanoBot.class, AbilityBot.class));
+    } catch (TelegramApiException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

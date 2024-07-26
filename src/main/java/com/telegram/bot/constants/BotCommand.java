@@ -1,8 +1,10 @@
-package com.telegram.bot.model;
+package com.telegram.bot.constants;
 
 public enum BotCommand {
   DICTIONARY("dictionary"),
-  QUIZZES("quiz");
+  QUIZZES("quiz"),
+  START("start"),
+  STOP("stop");
 
   public final String commandName;
 
