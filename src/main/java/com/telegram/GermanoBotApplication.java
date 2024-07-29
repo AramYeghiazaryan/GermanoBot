@@ -19,7 +19,7 @@ public class GermanoBotApplication {
     ConfigurableApplicationContext ctx = SpringApplication.run(GermanoBotApplication.class, args);
     try {
       TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-      botsApi.registerBot(ctx.getBean(GermanoBot.class, AbilityBot.class));
+      botsApi.registerBot(ctx.getBean(GermanoBot.class, AbilityBot.class    ));
     } catch (TelegramApiException e) {
       throw new RuntimeException(e);
     }

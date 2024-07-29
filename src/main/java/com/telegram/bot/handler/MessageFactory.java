@@ -67,10 +67,11 @@ public class MessageFactory {
     switch (command) {
       case UPDATE_DICTIONARY -> {
         try {
-          dictionaryService.updateDictionary();
+          int updatedEntitiesNumber = dictionaryService.updateDictionary().size();
           sender.execute(SendMessage.builder()
               .chatId(chatId)
-              .text("Updated Dictionary")
+              .text(String.format("Updated Dictionary with number of words %s",
+                  updatedEntitiesNumber))
               .replyMarkup(KeyboardFactory.startButtons())
               .build());
         } catch (TelegramApiException e) {

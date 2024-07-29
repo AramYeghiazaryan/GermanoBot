@@ -60,7 +60,7 @@ public class DuolingoService {
   public LearnedWordsResponse getPracticedLexemes(Set<ProgressedSkill> progressedSkills) {
     LexemesCountResponse lexemesCountResponse = getLexemesCount(progressedSkills);
     return duolingoClient.getLearnedLexemes(
-        "100",
+        "1000",
         "LEARNED_DATE",
         "0",
         Map.of(
