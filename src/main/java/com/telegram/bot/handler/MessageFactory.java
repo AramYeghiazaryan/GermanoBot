@@ -60,7 +60,7 @@ public class MessageFactory {
       return List.of(InputMediaAudio.builder()
           .caption("Super Gut!")
           .media(SUPER_AUDIO_URL)
-          .media("Super")
+          .title("Super")
           .build());
     }
     return wrongAnswers.stream()

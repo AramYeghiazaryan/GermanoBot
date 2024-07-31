@@ -38,7 +38,7 @@ public class QuizService {
       String translation = iterator.next();
       LexemeEntity lexemeEntity = wordsTranslationsMap.get(translation.toLowerCase());
       if (lexemeEntity != null && answer.equalsIgnoreCase(lexemeEntity.getWord())) {
-        wordsTranslationsMap.remove(translation);
+        wordsTranslationsMap.remove(translation.toLowerCase());
         iterator.remove(); // Safely remove element from translations list
       }
     }
