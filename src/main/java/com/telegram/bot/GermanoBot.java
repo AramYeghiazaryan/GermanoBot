@@ -1,56 +1,84 @@
 package com.telegram.bot;
 
-import static org.telegram.abilitybots.api.objects.Locality.USER;
-import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 import static org.telegram.abilitybots.api.util.AbilityUtils.getChatId;
 
 import com.telegram.bot.constants.BotCommand;
-import com.telegram.bot.constants.Constants;
+import com.telegram.bot.handler.KeyboardFactory;
 import com.telegram.bot.handler.MessageFactory;
 import com.telegram.bot.service.DictionaryService;
-import java.util.function.BiConsumer;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.telegram.bot.service.QuizService;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.telegram.abilitybots.api.bot.AbilityBot;
-import org.telegram.abilitybots.api.bot.BaseAbilityBot;
-import org.telegram.abilitybots.api.objects.Ability;
-import org.telegram.abilitybots.api.objects.Flag;
-import org.telegram.abilitybots.api.objects.Reply;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
+import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
-public class GermanoBot extends AbilityBot {
+public class GermanoBot extends TelegramLongPollingBot {
 
   private static final String BOT_TOKEN = "7277366517:AAEeLitCCl4pwRHpA3tFPMfN3QCA0vLVbcc";
   private static final String BOT_USERNAME = "Learn_DeutschBot";
   private final MessageFactory messageFactory;
 
-  @Override
-  public long creatorId() {
-    return 1;
-  }
-
   public GermanoBot(ApplicationContext context) {
-    super(BOT_TOKEN, BOT_USERNAME);
-    messageFactory = new MessageFactory(sender, context.getBean(DictionaryService.class));
+    super(BOT_TOKEN);
+    messageFactory = new MessageFactory(
+        context.getBean(DictionaryService.class),
+        context.getBean(QuizService.class)
+    );
   }
 
-  public Ability startBot() {
-    return Ability
-        .builder()
-        .name(BotCommand.START.commandName)
-        .info(Constants.START_DESCRIPTION.getText())
-        .locality(USER)
-        .privacy(PUBLIC)
-        .action(ctx -> messageFactory.start(ctx.chatId()))
-        .build();
+  @Override
+  public void onUpdateReceived(Update update) {
+    if (update.hasMessage() && update.getMessage().hasText()) {
+      try {
+        Message message = update.getMessage();
+        BotCommand command = Optional.ofNullable(
+                BotCommand.fromCommandName(message.getText().replaceAll("/", "")))
+            .orElse(BotCommand.QUIZ_ANSWER);
+
+        if (BotCommand.QUIZ_ANSWER.equals(command)) {
+          executeQuizAnswerResponse(update, message);
+        } else {
+          execute(messageFactory.replyToButtonsWithText(getChatId(update), command));
+        }
+      } catch (TelegramApiException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
-  public Reply replyToButtons() {
-    BiConsumer<BaseAbilityBot, Update> action = (abilityBot, upd) -> messageFactory.replyToButtons(
-        getChatId(upd), upd.getMessage());
-    return Reply.of(action, Flag.TEXT, upd -> messageFactory.isUserActive(getChatId(upd)));
+  private void executeQuizAnswerResponse(Update update, Message message) throws TelegramApiException {
+    List<InputMedia> responseAudios = messageFactory.sendQuizAudioAnswer(message);
+    if (responseAudios.size() == 1) {
+      InputMedia inputMedia = responseAudios.get(0);
+      execute(SendAudio.builder()
+          .chatId(getChatId(update))
+          .caption(inputMedia.getCaption())
+          .audio(new InputFile(inputMedia.getMedia()))
+          .replyMarkup(KeyboardFactory.quizNumberOfWordsButtons())
+          .build());
+    } else {
+      execute(SendMediaGroup.builder()
+          .medias(responseAudios)
+          .chatId(getChatId(update))
+          .build());
+      execute(SendMessage.builder()
+          .replyMarkup(KeyboardFactory.quizNumberOfWordsButtons())
+          .build());
+    }
+  }
+
+  @Override
+  public String getBotUsername() {
+    return BOT_USERNAME;
   }
 }

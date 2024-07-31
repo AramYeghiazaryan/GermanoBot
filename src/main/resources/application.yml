@@ -1,9 +1,11 @@
 logging:
   level:
-    root: debug
-
+    root: info
 
 spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/germanobot
+      collections:
+        lexeme-collection-name: lexemes
+

@@ -9,8 +9,15 @@ public class KeyboardFactory {
 
   public static ReplyKeyboardMarkup startButtons() {
     KeyboardRow row = new KeyboardRow();
-    row.add(BotCommand.UPDATE_DICTIONARY.commandName);
-    row.add(BotCommand.CREATE_QUIZZES.commandName);
+    row.add(BotCommand.UPDATE_DICTIONARY.getCommandName());
+    row.add(BotCommand.CREATE_QUIZZES.getCommandName());
+    return new ReplyKeyboardMarkup(List.of(row));
+  }
+
+  public static ReplyKeyboardMarkup quizNumberOfWordsButtons() {
+    KeyboardRow row = new KeyboardRow();
+    row.add(BotCommand.GET_WORD.getCommandName());
+    row.add(BotCommand.MAIN_MENU.getCommandName());
     return new ReplyKeyboardMarkup(List.of(row));
   }
 }
